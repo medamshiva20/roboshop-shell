@@ -21,7 +21,7 @@ if [ $USERID -ne 0 ]
 fi
 
 VALIDATE(){
-    if [ $? -ne 0 ]
+    if [ $1 -ne 0 ]
        then 
           echo -e "$2 ...$R FAILURE $N"
           exit 1

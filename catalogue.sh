@@ -6,6 +6,7 @@ LOGSDIR=/tmp
 SCRIPT_NAME=$0
 LOGFILE=$LOGSDIR/$0-$DATE.log
 USERID=$(id -u)
+username=roboshop
 R="\e[31m"
 G="\e[32m"
 N="\e[0m"
@@ -38,7 +39,13 @@ VALIDATE $? "Installing NodeJS"
 #once the user is created, if you run this script 2nd time
 # this command will defnitely fail
 # IMPROVEMENT: first check the user already exist or not, if not exist then create
-useradd roboshop &>>$LOGFILE
+if id "$username" &> /dev/null 
+ then
+    echo "User $username already exist."
+ else
+    echo "User $username does not exist. Creating user..." 
+    useradd $username &>>$LOGFILE
+fi
 
 #write a condition to check directory already exist or not
 mkdir /app &>>$LOGFILE
@@ -51,7 +58,7 @@ cd /app &>>$LOGFILE
 
 VALIDATE $? "Moving into app directory"
 
-unzip /tmp/catalogue.zip &>>$LOGFILE
+unzip -o /tmp/catalogue.zip &>>$LOGFILE
 
 VALIDATE $? "unzipping catalogue"
 

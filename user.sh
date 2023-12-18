@@ -20,7 +20,12 @@ if [ $USERID -ne 0 ]
 fi
 
 VALIDATE(){
-    
+    if [ $1 -ne 0 ]
+     then 
+       echo -e "$2 ... $R FAILURE $N"
+     else
+       echo -e "$2 ... $G SUCCESS $N"
+    fi
 }
 
 curl -sL https://rpm.nodesource.com/setup_lts.x | bash
@@ -74,5 +79,3 @@ VALIDATE $? "Installing mongo client"
 
 mongo --host 172.31.21.80 </app/schema/user.js &>>$LOGFILE
 VALIDATE $? "loading user data into mongodb"
-
-

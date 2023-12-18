@@ -38,7 +38,13 @@ VALIDATE $? "Installing NodeJS"
 #once the user is created, if you run this script 2nd time
 # this command will defnitely fail
 # IMPROVEMENT: first check the user already exist or not, if not exist then create
-useradd roboshop &>>$LOGFILE
+if id "$username" &> /dev/null 
+ then
+    echo "User $username already exist."
+ else
+    echo "User $username does not exist. Creating user..." 
+    useradd $username &>>$LOGFILE
+fi
 
 #write a condition to check directory already exist or not
 mkdir /app &>>$LOGFILE
@@ -84,6 +90,6 @@ yum install mongodb-org-shell -y &>>$LOGFILE
 
 VALIDATE $? "Installing mongo client"
 
-mongo --host mongodb.joindevops.online </app/schema/user.js &>>$LOGFILE
+mongo --host 172.31.21.80 </app/schema/user.js &>>$LOGFILE
 
 VALIDATE $? "loading user data into mongodb"

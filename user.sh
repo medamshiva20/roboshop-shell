@@ -1,81 +1,89 @@
-#!/bin/bash 
+#!/bin/bash
 
-USERID=$(id -u)
-DATE=$(date +%F:%H:%M:%S)
-LOG_DIR=/tmp
+DATE=$(date +%F)
+LOGSDIR=/tmp
+# /home/centos/shellscript-logs/script-name-date.log
 SCRIPT_NAME=$0
-LOGFILE=$LOG_DIR/$SCRIPT_NAME-$DATE.log
-username=roboshop
-
+LOGFILE=$LOGSDIR/$0-$DATE.log
+USERID=$(id -u)
 R="\e[31m"
 G="\e[32m"
 N="\e[0m"
 Y="\e[33m"
 
-if [ $USERID -ne 0 ]
-  then 
-      echo "ERROR:: Please run this script with root access"
-  else
-      echo "INFO: You are root user"
+if [ $USERID -ne 0 ];
+then
+    echo -e "$R ERROR:: Please run this script with root access $N"
+    exit 1
 fi
 
 VALIDATE(){
-    if [ $1 -ne 0 ]
-     then 
-       echo -e "$2 ... $R FAILURE $N"
-     else
-       echo -e "$2 ... $G SUCCESS $N"
+    if [ $1 -ne 0 ];
+    then
+        echo -e "$2 ... $R FAILURE $N"
+        exit 1
+    else
+        echo -e "$2 ... $G SUCCESS $N"
     fi
 }
 
-curl -sL https://rpm.nodesource.com/setup_lts.x | bash
+curl -sL https://rpm.nodesource.com/setup_lts.x | bash &>>$LOGFILE
+
 VALIDATE $? "Setting up NPM Source"
 
-yum install nodejs -y
-VALIDATE $? "Installing NodeJS" &>>$LOGFILE
+yum install nodejs -y &>>$LOGFILE
 
+VALIDATE $? "Installing NodeJS"
+
+#once the user is created, if you run this script 2nd time
+# this command will defnitely fail
 # IMPROVEMENT: first check the user already exist or not, if not exist then create
-if id "$username" &> /dev/null 
- then
-    echo "User $username already exist."
- else
-    echo "User $username does not exist. Creating user..." 
-    useradd $username &>>$LOGFILE
-fi
+useradd roboshop &>>$LOGFILE
 
 #write a condition to check directory already exist or not
 mkdir /app &>>$LOGFILE
 
-curl -L -o /tmp/user.zip https://roboshop-builds.s3.amazonaws.com/user.zip
-VALIDATE $? "downloading catalogue artifact"
+curl -o /tmp/user.zip https://roboshop-builds.s3.amazonaws.com/user.zip &>>$LOGFILE
+
+VALIDATE $? "downloading user artifact"
 
 cd /app &>>$LOGFILE
+
 VALIDATE $? "Moving into app directory"
 
-unzip -o /tmp/catalogue.zip &>>$LOGFILE
-VALIDATE $? "unzipping catalogue"
+unzip /tmp/user.zip &>>$LOGFILE
+
+VALIDATE $? "unzipping user"
 
 npm install &>>$LOGFILE
+
 VALIDATE $? "Installing dependencies"
 
-# give full path of catalogue.service because we are inside /app
-cp /home/centos/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>>$LOGFILE
-VALIDATE $? "copying catalogue.service"
+# give full path of user.service because we are inside /app
+cp /home/centos/roboshop-shell/user.service /etc/systemd/system/user.service &>>$LOGFILE
+
+VALIDATE $? "copying user.service"
 
 systemctl daemon-reload &>>$LOGFILE
+
 VALIDATE $? "daemon reload"
 
-systemctl enable catalogue &>>$LOGFILE
-VALIDATE $? "Enabling Catalogue"
+systemctl enable user &>>$LOGFILE
 
-systemctl start catalogue &>>$LOGFILE
-VALIDATE $? "Starting Catalogue"
+VALIDATE $? "Enabling user"
+
+systemctl start user &>>$LOGFILE
+
+VALIDATE $? "Starting user"
 
 cp /home/centos/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOGFILE
+
 VALIDATE $? "Copying mongo repo"
 
 yum install mongodb-org-shell -y &>>$LOGFILE
+
 VALIDATE $? "Installing mongo client"
 
-mongo --host 172.31.21.80 </app/schema/user.js &>>$LOGFILE
+mongo --host mongodb.joindevops.online </app/schema/user.js &>>$LOGFILE
+
 VALIDATE $? "loading user data into mongodb"

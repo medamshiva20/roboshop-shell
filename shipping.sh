@@ -47,10 +47,10 @@ fi
 #write a condition to check directory already exist or not
 if [ -d "$directory" ]
  then 
-     echo "Directory $directory does not exist"
- else
      echo "Directory $directory already exist"
-     mkdir /app &>>$LOGFILE
+ else
+      echo "Directory $directory does not exist,Let's create"
+      mkdir /app &>>$LOGFILE
 fi
 
 

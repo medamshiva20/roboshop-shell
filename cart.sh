@@ -7,6 +7,7 @@ SCRIPT_NAME=$0
 LOGFILE=$LOGSDIR/$0-$DATE.log
 USERID=$(id -u)
 username=roboshop
+directory=/app
 
 R="\e[31m"
 G="\e[32m"
@@ -38,31 +39,37 @@ VALIDATE $? "Installing NodeJS"
 #once the user is created, if you run this script 2nd time
 # this command will defnitely fail
 # IMPROVEMENT: first check the user already exist or not, if not exist then create
-if id "$username" &> /dev/null 
- then
-    echo "User $username already exist."
- else
-    echo "User $username does not exist. Creating user..." 
-    useradd $username &>>$LOGFILE
+if id "$username" &> /dev/null
+  then 
+     echo "User $username already exist"
+  else
+     echo "User $username deos not exist.Creating user..."
+     useradd $username &>>$LOGFILE
 fi
 
 #write a condition to check directory already exist or not
-mkdir /app &>>$LOGFILE
+if [ -d "$directory"]
+ then 
+     echo "Directory $directory does not exist"
+ else
+     echo "Directory $directory already exist"
+     mkdir /app &>>$LOGFILE
+fi
 
-curl -o /tmp/user.zip https://roboshop-builds.s3.amazonaws.com/user.zip &>>$LOGFILE
-VALIDATE $? "downloading user artifact"
+curl -o /tmp/cart.zip https://roboshop-builds.s3.amazonaws.com/cart.zip &>>$LOGFILE
+VALIDATE $? "downloading cart artifact"
 
 cd /app &>>$LOGFILE
 VALIDATE $? "Moving into app directory"
 
-unzip -o /tmp/user.zip &>>$LOGFILE
-VALIDATE $? "unzipping user"
+unzip -o /tmp/cart.zip &>>$LOGFILE
+VALIDATE $? "unzipping cart"
 
 npm install &>>$LOGFILE
 VALIDATE $? "Installing dependencies"
 
-# give full path of user.service because we are inside /app
-cp /home/centos/roboshop-shell/user.service /etc/systemd/system/user.service &>>$LOGFILE
+# give full path of cart.service because we are inside /app
+cp /home/centos/roboshop-shell/cart.service /etc/systemd/system/cart.service &>>$LOGFILE
 VALIDATE $? "copying cart.service"
 
 systemctl daemon-reload &>>$LOGFILE
@@ -73,4 +80,3 @@ VALIDATE $? "Enabling cart"
 
 systemctl start cart &>>$LOGFILE
 VALIDATE $? "Starting cart"
-

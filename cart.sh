@@ -30,11 +30,9 @@ VALIDATE(){
 }
 
 curl -sL https://rpm.nodesource.com/setup_lts.x | bash &>>$LOGFILE
-
 VALIDATE $? "Setting up NPM Source"
 
 yum install nodejs -y &>>$LOGFILE
-
 VALIDATE $? "Installing NodeJS"
 
 #once the user is created, if you run this script 2nd time
@@ -52,46 +50,27 @@ fi
 mkdir /app &>>$LOGFILE
 
 curl -o /tmp/user.zip https://roboshop-builds.s3.amazonaws.com/user.zip &>>$LOGFILE
-
 VALIDATE $? "downloading user artifact"
 
 cd /app &>>$LOGFILE
-
 VALIDATE $? "Moving into app directory"
 
 unzip -o /tmp/user.zip &>>$LOGFILE
-
 VALIDATE $? "unzipping user"
 
 npm install &>>$LOGFILE
-
 VALIDATE $? "Installing dependencies"
 
 # give full path of user.service because we are inside /app
 cp /home/centos/roboshop-shell/user.service /etc/systemd/system/user.service &>>$LOGFILE
-
-VALIDATE $? "copying user.service"
+VALIDATE $? "copying cart.service"
 
 systemctl daemon-reload &>>$LOGFILE
-
 VALIDATE $? "daemon reload"
 
-systemctl enable user &>>$LOGFILE
+systemctl enable cart &>>$LOGFILE
+VALIDATE $? "Enabling cart"
 
-VALIDATE $? "Enabling user"
+systemctl start cart &>>$LOGFILE
+VALIDATE $? "Starting cart"
 
-systemctl start user &>>$LOGFILE
-
-VALIDATE $? "Starting user"
-
-cp /home/centos/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOGFILE
-
-VALIDATE $? "Copying mongo repo"
-
-yum install mongodb-org-shell -y &>>$LOGFILE
-
-VALIDATE $? "Installing mongo client"
-
-mongo --host 172.31.21.80 </app/schema/user.js &>>$LOGFILE
-
-VALIDATE $? "loading user data into mongodb"

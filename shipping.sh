@@ -45,7 +45,7 @@ if id "$username" &> /dev/null
 fi
 
 #write a condition to check directory already exist or not
-if [ -d "$directory"]
+if [ -d "$directory" ]
  then 
      echo "Directory $directory does not exist"
  else

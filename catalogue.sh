@@ -7,6 +7,8 @@ SCRIPT_NAME=$0
 LOGFILE=$LOGSDIR/$0-$DATE.log
 USERID=$(id -u)
 username=roboshop
+directory=/app
+
 R="\e[31m"
 G="\e[32m"
 N="\e[0m"
@@ -28,6 +30,15 @@ VALIDATE(){
     fi
 }
 
+#write a condition to check directory already exist or not
+if [ -d $directory ]
+  then 
+      echo "Directory $directory already exist"
+  else
+      echo "Directory $directory does not exist,Let's create"
+      mkdir $directory &>>$LOGFILE
+fi
+
 curl -sL https://rpm.nodesource.com/setup_lts.x | bash &>>$LOGFILE
 
 VALIDATE $? "Setting up NPM Source"
@@ -43,12 +54,9 @@ if id "$username" &> /dev/null
  then
     echo "User $username already exist."
  else
-    echo "User $username does not exist. Creating user..." 
+    echo "User $username does not exist. Creating user..."
     useradd $username &>>$LOGFILE
 fi
-
-#write a condition to check directory already exist or not
-mkdir /app &>>$LOGFILE
 
 curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip &>>$LOGFILE
 
@@ -88,9 +96,9 @@ cp /home/centos/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOGFIL
 VALIDATE $? "Copying mongo repo"
 
 yum install mongodb-org-shell -y &>>$LOGFILE
-
+   
 VALIDATE $? "Installing mongo client"
 
 mongo --host 172.31.31.227 </app/schema/catalogue.js &>>$LOGFILE
 
-VALIDATE $? "loading catalogue data into mongodb"
+VALIDATE $? "loading catalogue data into mongodb" 

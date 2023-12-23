@@ -20,6 +20,8 @@ do
     IP_ADDRESS=$(aws ec2 run-instances --image-id $IMAGE_ID  --instance-type $INSTANCE_TYPE --security-group-ids $SECURITY_GROUP_ID --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$i}]" | jq -r '.Instances[0].PrivateIpAddress')
     echo "created $i instance: $IP_ADDRESS"
 
+
+#https://repost.aws/knowledge-center/simple-resource-record-route53-cli -- To create the route 53 records through AWS CLI 
     aws route53 change-resource-record-sets --hosted-zone-id Z02130291L9UW40NZZ0BT --change-batch '
     {
             "Changes": [{

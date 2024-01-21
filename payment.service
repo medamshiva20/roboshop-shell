@@ -4,11 +4,11 @@ Description=Payment Service
 [Service]
 User=root
 WorkingDirectory=/app
-Environment=CART_HOST=172.31.23.177
+Environment=CART_HOST=catalogue.sivadevops.website
 Environment=CART_PORT=8080
-Environment=USER_HOST=172.31.27.51
+Environment=USER_HOST=user.sivadevops.website
 Environment=USER_PORT=8080
-Environment=AMQP_HOST=172.31.30.107
+Environment=AMQP_HOST=rabbitmq.sivadevops.website
 Environment=AMQP_USER=roboshop
 Environment=AMQP_PASS=roboshop123
 

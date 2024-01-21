@@ -7,6 +7,7 @@ SCRIPT_NAME=$0
 LOGFILE=$LOGSDIR/$0-$DATE.log
 USERID=$(id -u)
 username=roboshop
+directory=/app
 
 R="\e[31m"
 G="\e[32m"
@@ -49,7 +50,13 @@ if id "$username" &> /dev/null
 fi
 
 #write a condition to check directory already exist or not
-mkdir /app &>>$LOGFILE
+if [ -d $directory ]
+ then
+   echo "Directory $directory alreday exist"
+ else
+   echo "Directory $directory does not exist, Let's create"
+   mkdir /app &>>$LOGFILE
+fi
 
 curl -o /tmp/user.zip https://roboshop-builds.s3.amazonaws.com/user.zip &>>$LOGFILE
 
@@ -92,6 +99,6 @@ yum install mongodb-org-shell -y &>>$LOGFILE
 
 VALIDATE $? "Installing mongo client"
 
-mongo --host 172.31.31.227 </app/schema/user.js &>>$LOGFILE
+mongo --host mongodb.sivadevops.website </app/schema/user.js &>>$LOGFILE
 
 VALIDATE $? "loading user data into mongodb"

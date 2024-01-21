@@ -95,7 +95,7 @@ yum install mysql -y  &>>$LOGFILE
 
 VALIDATE $? "Installing MySQL client"
 
-mysql -h 172.31.31.243 -uroot -pRoboShop@1 < /app/schema/shipping.sql  &>>$LOGFILE
+mysql -h mysql.sivadevops.website -uroot -pRoboShop@1 < /app/schema/shipping.sql  &>>$LOGFILE
 
 VALIDATE $? "Loaded countries and cities info"
 

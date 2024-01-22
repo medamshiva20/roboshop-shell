@@ -9,7 +9,8 @@ DOMAIN_NAME=sivadevops.website
 # if mysql or mongodb instance_type should be t3.medium , for all others it is t2.micro
 
 for i in "${NAMES[@]}"
-do  
+do 
+
     if [[ $i == "mongodb" || $i == "mysql" ]]
     then
         INSTANCE_TYPE="t3.medium"
